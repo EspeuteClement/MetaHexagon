@@ -1,8 +1,10 @@
 #include "Hexagon.h"
+#include "Patterns.h"
+#include "Sound.h"
 
 Hexagon::Hexagon()
 {
-
+    _sound_channel = -1;
 }
 
 Hexagon::~Hexagon()
@@ -12,6 +14,21 @@ Hexagon::~Hexagon()
 
 void Hexagon::init()
 {
+    if (_sound_channel != -1 || gb.sound.isPlaying(_sound_channel))
+    {
+        gb.sound.stop(_sound_channel);
+    }
+
+    _sound_channel = gb.sound.play(new Sound_Handler_Custom(NULL), true);
+
+#ifdef __DEBUG_OUTPUT__
+    if (_sound_channel != -1)
+        SerialUSB.printf("[LOG] Sound started\n");
+    else
+        SerialUSB.printf("[WARNING] Sound Error\n");
+#endif
+
+
     _time = 0;
     _sides = 6;
     _state = State::PLAY;
@@ -26,7 +43,18 @@ void Hexagon::init()
 
     // Player
     _player_angle = 0;
-    _player_speed = 6;
+    _player_speed = 8;
+
+    // Init pattern playing
+    initPattern(Patterns::getRandomPattern());
+}
+
+void Hexagon::initPattern(const Hexagon::Pattern * pattern)
+{
+    current_pattern = pattern;
+    current_pattern_position = 0;
+    current_pattern_wall_index = 0;
+    current_pattern_lane_offset = rand() % _sides;
 }
 
 void Hexagon::update()
@@ -50,13 +78,54 @@ void Hexagon::update()
 
 void Hexagon::updatePlay()
 {
-        // Push a random wall in the field
+    // Push a random wall in the field
     if (gb.buttons.pressed(BUTTON_A))
     {
         pushWall({rand()%_sides, 60, rand()%10 + 4 });
     }
 
+    // Update pattern
+    current_pattern_position += _wall_speed;
+    for (int wall = current_pattern_wall_index; wall < current_pattern->nb_walls; wall ++)
+    {
+        if (current_pattern->walls[wall].distance < current_pattern_position)
+        {
+            current_pattern_wall_index++;
+            Wall * new_wall = pushWall(current_pattern->walls[wall]);
+            new_wall->distance = WALL_SPAWN_OFFSET;
+            new_wall->lane = ( new_wall->lane + current_pattern_lane_offset) % _sides;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    if (current_pattern_wall_index >= current_pattern->nb_walls )
+    {
+        initPattern(Patterns::getRandomPattern());
+    }
+
+    
+
     _center_distance = 6;
+
+    // Pump
+    if (_time % PUMP_FREQ == 0)
+    {
+        _pump_offset = PUMP_SET;
+    }
+    else
+    {
+        _pump_offset -= PUMP_FALLOFF;
+    }
+
+    if (_pump_offset < 0)
+    {
+        _pump_offset = 0;
+    }
+
+
 
     // Update all walls
     for (int i = 0; i < MAX_WALLS; i++)
@@ -151,7 +220,7 @@ void Hexagon::draw()
     gb.display.setColor(color_bg2);
     for (int lane = 0; lane < _sides; lane += 2)
     {
-        drawWall(lane, _center_distance, 60);
+        drawWall(lane, _center_distance + getPump(), 60);
     }
 
     // Draw center hexagon
@@ -167,7 +236,7 @@ void Hexagon::draw()
             int width = _walls[i].width - (distance - _walls[i].distance);
             if (width > 0)
             {
-                drawWall(_walls[i].lane, distance, width);
+                drawWall(_walls[i].lane, distance + getPump(), width);
             }
 
         }
@@ -175,16 +244,16 @@ void Hexagon::draw()
 
     for (int lane = 0; lane < _sides; lane ++)
     {
-        Utils::Point p1 = getPoint(lane, _center_distance);
-        Utils::Point p2 = getPoint(lane+1, _center_distance);
+        Utils::Point p1 = getPoint(lane, _center_distance + getPump());
+        Utils::Point p2 = getPoint(lane+1, _center_distance + getPump());
         gb.display.drawLine(p1.x, p1.y, p2.x, p2.y);
     }
 
     // draw the player
     int s = Utils::sin(_player_angle + _angle_offset);
     int c = -Utils::cos(_player_angle + _angle_offset);
-    Utils::Point pos = {((s * _player_distance) >> 8) +  gb.display.width()/2,
-                        ((c * _player_distance) >> 8) +  gb.display.height()/2};
+    Utils::Point pos = {((s * (_player_distance + getPump())) >> 8) +  gb.display.width()/2,
+                        ((c * (_player_distance + getPump())) >> 8) +  gb.display.height()/2};
 
     gb.display.drawPixel(pos.x, pos.y);
     gb.display.drawPixel(pos.x+1, pos.y);
@@ -192,6 +261,26 @@ void Hexagon::draw()
     gb.display.drawPixel(pos.x, pos.y+1);
     gb.display.drawPixel(pos.x, pos.y-1);
 
+    // Display score
+    gb.display.setColor(BLACK);
+    for (int i = 0; i < 7; i++)
+    {
+        int x = 84 - 28 + i/2;
+        gb.display.drawFastHLine(x, i, 28);
+    }
+
+    gb.display.setColor(WHITE);
+    gb.display.setCursorX(84-24);
+    gb.display.setCursorY(1);
+    if ((_time / 25) < 100)
+    {
+        gb.display.printf("%02d:%02d", (_time / 25), ((_time % 25) * 100 / 25));
+    }
+    else
+    {
+        gb.display.printf("%03d:%01d", (_time / 25), ((_time % 25) * 10 / 25));
+    }
+    
 
 #ifdef __DEBUG_OUTPUT__
     if (_time%25 == 0)
@@ -263,7 +352,7 @@ void Hexagon::drawWall(uint8_t lane, int16_t distance, int8_t width)
     Utils::drawQuad(p1, p2, p3, p4);
 }
 
-void Hexagon::pushWall(const Wall & wall)
+Hexagon::Wall * Hexagon::pushWall(const Wall & wall)
 {
     _wall_counter = (_wall_counter + 1) % MAX_WALLS;
 
@@ -275,6 +364,8 @@ void Hexagon::pushWall(const Wall & wall)
 #endif
 
     _walls[_wall_counter] = wall;
+
+    return &_walls[_wall_counter];
 }
 
 void Hexagon::computeAngleOffset()
