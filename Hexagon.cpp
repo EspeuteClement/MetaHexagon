@@ -19,14 +19,7 @@ void Hexagon::init()
         gb.sound.stop(_sound_channel);
     }
 
-    _sound_channel = gb.sound.play(new Sound_Handler_Custom(NULL), true);
-
-#ifdef __DEBUG_OUTPUT__
-    if (_sound_channel != -1)
-        SerialUSB.printf("[LOG] Sound started\n");
-    else
-        SerialUSB.printf("[WARNING] Sound Error\n");
-#endif
+    //_sound_channel = gb.sound.play(new Sound_Handler_Custom(NULL), true);
 
 
     _time = 0;
@@ -34,7 +27,7 @@ void Hexagon::init()
     _state = State::PLAY;
 
     // Walls
-    _wall_speed = 1;
+    _wall_speed = 2;
     // init walls
     for (int i = 0; i < MAX_WALLS; i++)
     {
