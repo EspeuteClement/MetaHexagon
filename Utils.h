@@ -22,5 +22,15 @@ namespace Utils
     struct Point { int16_t x; int16_t y;};
     void drawQuad(const Point & p1, const Point & p2, const Point & p3, const Point & p4);
 
+    /** Perform a modulo on value by div, and works even if value is negative */
+    inline int32_t smod(int32_t value, int32_t div)
+    {
+        return ((value % div) + div) % div;
+    }
+
+    template <typename T> inline int sign(T val) {
+    return (T(0) < val) - (val < T(0));
+    }
+
 }
 

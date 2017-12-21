@@ -12,11 +12,18 @@ public:
     static const uint8_t MAX_WALLS = 32;
     static const uint8_t PLAYER_OFFSET = 3;
     static const uint8_t MAX_WALL_PER_PATTERN = 32;
-    static const uint16_t WALL_SPAWN_OFFSET = 60;
+    static const uint16_t WALL_SPAWN_OFFSET = 70; // At which distance a wall spawns
+
+    static const int32_t FPP = 5; // Fixed point arithmetic precision in bits
     
-    static const uint16_t PUMP_SET = 3 << 8; // How much the pump is at max level
+    static const uint16_t PUMP_SET = 3 << FPP; // How much the pump is at max level
     static const uint16_t PUMP_FREQ = 20; // How much frames we wait before we pump
-    static const uint16_t PUMP_FALLOFF = 64; // divide by 256 
+    static const uint16_t PUMP_FALLOFF = 16; // divide by 256 
+    
+    static const uint32_t PUMP_DEATH_ZOOM = 32;
+    static const uint32_t PUMP_DEATH_MAX = 20 << FPP;
+    static const uint32_t WALL_DEATH_SPEED = (1 << FPP) + 16;
+    static const uint32_t DEATH_ZOOM_TIMING = 25;
 
     Hexagon();
     ~Hexagon();
@@ -30,7 +37,7 @@ public:
     struct Wall
     {
         uint8_t lane; // If = UINT8_MAX, should not be drawn
-        int16_t distance;
+        int32_t distance;
         uint8_t width;
     }; // 32 bit long struct
 
@@ -54,6 +61,8 @@ private:
     int8_t _sound_channel;
 
     uint32_t _time;      // Count the time inside the game
+    uint32_t _score;     // Score/time of the player
+    uint32_t _best_score;
     int32_t _lane_trig[MAX_SIDES * 2]; // Keep track of the lanes coeficients. i*2 = sin, i*2+1 = -cos
     uint8_t _sides;          // How much the hexagon has sides (so we can change to pentagon or square)
 
@@ -64,6 +73,8 @@ private:
     int16_t current_pattern_position; // Indicate how much distance we are in the pattern
     uint8_t current_pattern_wall_index; // Indicate the next wall to push
     uint8_t current_pattern_lane_offset; // Random lane offset for the current pattern
+    int16_t current_pattern_length;
+    bool current_pattern_mirror;
 
     uint8_t _wall_counter; // 'Point' to the last inserted wall in the _walls array; 
     uint16_t _center_distance;
@@ -74,7 +85,10 @@ private:
     int16_t _player_distance;
 
     int16_t _angle_offset;
+    int16_t _angle_offset_speed;
     int16_t _pump_offset;
+
+    int32_t _time_death;
 
     State _state;
 
@@ -98,7 +112,7 @@ private:
 
     void initPattern(const Hexagon::Pattern * pattern);
 
-    inline int16_t getPump() {return _pump_offset >> 8;};
+    inline int16_t getPump() {return _pump_offset >> FPP;};
 
     /** === INLINE METHODS =========================================================================*/
     /** Returns a point on a lane at the given distance.
@@ -114,7 +128,7 @@ private:
     }
 
     // Check if a wall should be considered as part of the game
-    inline bool isWallValid(const Wall & w) { return w.lane != UINT8_MAX;}
+    inline bool isWallValid(const Wall & w) { return w.lane < _sides;}
 
     inline uint8_t getLane(uint8_t angle) { return angle / (256/_sides);}; 
 };
