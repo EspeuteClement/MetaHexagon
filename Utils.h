@@ -32,5 +32,13 @@ namespace Utils
     return (T(0) < val) - (val < T(0));
     }
 
+    struct vec3
+    {
+        union {uint8_t r;uint8_t h;int8_t x;};
+        union {uint8_t g;uint8_t s;int8_t y;};
+        union {uint8_t b;uint8_t v;int8_t z;};
+    };
+
+    vec3 hsv2rgb(vec3 hvs);
 }
 

@@ -32,6 +32,7 @@ public:
     void update();
     void updatePlay();
     void updateGameOver();
+    
     void draw();
 
     struct Wall
@@ -75,6 +76,8 @@ private:
     uint8_t current_pattern_lane_offset; // Random lane offset for the current pattern
     int16_t current_pattern_length;
     bool current_pattern_mirror;
+
+    void (*colorCallback)(Color & bg1, Color & bg2, Color & walls, uint32_t time);
 
     uint8_t _wall_counter; // 'Point' to the last inserted wall in the _walls array; 
     uint16_t _center_distance;

@@ -1,6 +1,7 @@
 #pragma once
 #include "Hexagon.h"
-#define __PATTERN_OVERRIDE__ 3
+#include <Gamebuino-Meta.h>
+//#define __PATTERN_OVERRIDE__ 3
 namespace Patterns
 {
 
@@ -9,11 +10,11 @@ namespace Patterns
         {   
             5, // All but one wall
             {
-                {1  ,20,5},
-                {2  ,20,5},
-                {3  ,20,5},
-                {4  ,20,5},
-                {5  ,20,5}
+                {1  ,30,5},
+                {2  ,30,5},
+                {3  ,30,5},
+                {4  ,30,5},
+                {5  ,30,5}
             }
         },
         {   // 3, then 3, then 3 again  
@@ -90,8 +91,9 @@ namespace Patterns
 #ifdef __PATTERN_OVERRIDE__
         return &level_1[__PATTERN_OVERRIDE__];
 #else
-        return &level_1[rand()%(sizeof(level_1)/sizeof(level_1))];
+        return &level_1[rand()%(sizeof(level_1)/sizeof(Hexagon::Pattern))];
 #endif
     }
 }
 
+void colorCallback_test(Color & bg1, Color & bg2, Color & walls, uint32_t time);

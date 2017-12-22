@@ -19,7 +19,7 @@ void Hexagon::init()
         gb.sound.stop(_sound_channel);
     }
 
-    //_sound_channel = gb.sound.play(new Sound_Handler_Custom(NULL), true);
+    _sound_channel = gb.sound.play("MetaHexagon.wav", true);
 
 
     _time = 0;
@@ -29,7 +29,7 @@ void Hexagon::init()
     _state = State::PLAY;
 
     // Walls
-    _wall_speed = (1 << FPP);
+    _wall_speed = (1 << FPP) + 16;
     // init walls
     for (int i = 0; i < MAX_WALLS; i++)
     {
@@ -38,12 +38,14 @@ void Hexagon::init()
 
     // Player
     _player_angle = 0;
-    _player_speed = 8 << FPP;
+    _player_speed = 10 << FPP;
 
     _angle_offset = 0;
     _angle_offset_speed = 16;
     _pump_offset = 0;
     _best_score = 999;
+
+    colorCallback = &colorCallback_test;
 
     // Init pattern playing
     initPattern(Patterns::getRandomPattern());
@@ -182,7 +184,6 @@ void Hexagon::updatePlay()
         new_player_angle += _player_speed;
     }
 
-    //new_player_angle = ((new_player_angle % (256 << FPP)) + (256 << FPP)) % (256 << FPP);
     new_player_angle = Utils::smod(new_player_angle, 256 << FPP );
 
     // check for collision with the new position, then with the old one (so player don't loose if they hit the side of a wall)
@@ -267,9 +268,8 @@ void Hexagon::draw()
     computeLaneTrig();
 
     // Init frame colors
-    Color color_bg1   = gb.createColor(18, 78, 137);
-    Color color_bg2   = gb.createColor(0,149,233);
-    Color color_wall = gb.createColor(44,232,245);
+    Color color_bg1,color_bg2,color_wall;
+    (*colorCallback)(color_bg1,color_bg2,color_wall, _time);
     Color color_highlight = WHITE;
 
     // Clear to background color
@@ -348,8 +348,6 @@ void Hexagon::draw()
         gb.display.drawPixel(pos.x, pos.y-offset);
     }
 
-
-
     // Display score
 
     if (_time_death < DEATH_ZOOM_TIMING)
@@ -381,6 +379,7 @@ void Hexagon::draw()
             int x = 84 - 60 + i/2;
             gb.display.drawFastHLine(x, i + 23, 60);
             gb.display.drawFastHLine(x+4, i + 33, 60);
+            gb.display.drawFastHLine((42-24)+i/2, 63 - i, (24*2)-i);
         }
 
         gb.display.setColor(WHITE);
@@ -392,18 +391,20 @@ void Hexagon::draw()
         gb.display.setCursorY(34);
         gb.display.printf("BEST %3d:%02d", (_best_score / 25), ((_best_score % 25) * 100 / 25));
 
-
+        gb.display.setCursorX(42-20);
+        gb.display.setCursorY(64-6);
+        gb.display.printf("\x15 TO RETRY", (_best_score / 25), ((_best_score % 25) * 100 / 25));
     }
 
 
     
 
-#ifdef __DEBUG_OUTPUT__
+    #ifdef __DEBUG_OUTPUT__
     if (_time%25 == 0)
     {
         SerialUSB.printf("%d\n", gb.getCpuLoad());
     }
-#endif
+    #endif
 }
 
 
