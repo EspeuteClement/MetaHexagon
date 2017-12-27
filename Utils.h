@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include "Config.h"
+#include <Gamebuino-Meta.h>
 
 /** Small mathematical library
 *   @author Valden
@@ -36,9 +37,35 @@ namespace Utils
     {
         union {uint8_t r;uint8_t h;int8_t x;};
         union {uint8_t g;uint8_t s;int8_t y;};
-        union {uint8_t b;uint8_t v;int8_t z;};
+        union {uint8_t b;uint8_t v;uint8_t l; int8_t z;};
     };
 
+    static const int32_t FPP = 5;
+
+    // Convert an integer to a fixed point representation
+    inline constexpr int32_t toFix(const int32_t a) { return a << FPP;};
+
+    // Convert a fixed point number to a integer
+    inline constexpr int32_t fromFix(const int32_t a) { return a >> FPP;};
+
     vec3 hsv2rgb(vec3 hvs);
+
+    void computeLaneTrig(int16_t _angle_offset, uint8_t _sides);
+    int32_t getLaneTrig(uint8_t index);
+
+    inline Utils::Point getPoint(uint8_t lane, int16_t distance, uint8_t _sides)
+    {
+        // I tried to make this function as fast as possible.
+        return 
+        {
+            ((getLaneTrig((lane%_sides) * 2) * distance) >> 8) + gb.display.width()/2, // x
+            ((getLaneTrig((lane%_sides) * 2 + 1) * distance) >> 8) + gb.display.height()/2 // y
+        };
+    }
+
+    vec3 hsl2rgb(const vec3 & hsl);
+    uint8_t Hue2rgb(  uint16_t v1, uint16_t v2, uint8_t vH );
+
+    void drawTextCenter(uint8_t x, uint8_t y, const char * str);
 }
 

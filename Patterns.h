@@ -1,99 +1,35 @@
-#pragma once
 #include "Hexagon.h"
+#include "Utils.h"
 #include <Gamebuino-Meta.h>
-//#define __PATTERN_OVERRIDE__ 3
+
+#pragma once
+
+//#define __PATTERN_OVERRIDE__ 6
 namespace Patterns
 {
 
-    const Hexagon::Pattern level_1[] =
-    {
-        {   
-            5, // All but one wall
-            {
-                {1  ,30,5},
-                {2  ,30,5},
-                {3  ,30,5},
-                {4  ,30,5},
-                {5  ,30,5}
-            }
-        },
-        {   // 3, then 3, then 3 again  
-            9,
-            {
-                {1  ,20,5},
-                {3  ,20,5},
-                {5  ,20,5},
-                {0  ,35,5},
-                {2  ,35,5},
-                {4  ,35,5},
-                {1  ,50,5},
-                {3  ,50,5},
-                {5  ,50,5},
-            }
-        },
-        {   // 2 big walls, zig zag for the others
-            8,
-            {
-                {0, 20,35},
-                {3, 20,35},
-                {2, 20, 5},
-                {5, 20, 5},
-                {1, 35, 5},
-                {4, 35, 5},
-                {2, 50, 5},
-                {5, 50, 5}
-            }
-        },
-        {   // Spiral
-            12,
-            {
-                {0,20, 10},
-                {3,20, 10},
+    extern const Hexagon::Pattern patterns[];
 
-                {1,30, 10},
-                {4,30, 10},
-
-                {2,40, 10},
-                {5,40, 10},
-
-                {3,50, 10},
-                {0,50, 10},
-
-                {4,60, 10},
-                {1,60, 10},
-
-                {5,70, 10},
-                {2,70, 10},
-
-/*                {0,80, 10},
-                {3,80, 10},
-
-                {1,90, 10},
-                {4,90, 10},
-
-                {2,100, 10},
-                {5,100, 10},
-
-                {3,110, 10},
-                {0,110, 10},
-
-                {4,120, 10},
-                {1,120, 10},
-
-                {5,130, 10},
-                {2,130, 10},*/
-            }
-        }
-    };
-
-    inline const Hexagon::Pattern * getRandomPattern()
+    inline const Hexagon::Pattern * const getRandomPattern(const Hexagon::Level & level)
     {
 #ifdef __PATTERN_OVERRIDE__
-        return &level_1[__PATTERN_OVERRIDE__];
+        return &(patterns[__PATTERN_OVERRIDE__]);
 #else
-        return &level_1[rand()%(sizeof(level_1)/sizeof(Hexagon::Pattern))];
+        return (level.patterns[rand()%level.nb_patterns]);
 #endif
     }
+
+    extern const Hexagon::Level level_1;
+
+    extern const Hexagon::Level level_2;
+
+    extern const Hexagon::Level * levels[];
+    const uint8_t LEVEL_COUNT = 6;
+    void colorCallback_test(Color & bg1, Color & bg2, Color & walls, uint32_t time);
+    void colorCallback_gray(Color & bg1, Color & bg2, Color & walls, uint32_t time);
+    void colorCallback_black(Color & bg1, Color & bg2, Color & walls, uint32_t time);
+    void colorCallback_lock(Color & bg1, Color & bg2, Color & walls, uint32_t time);
 }
 
-void colorCallback_test(Color & bg1, Color & bg2, Color & walls, uint32_t time);
+
+
