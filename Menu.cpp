@@ -3,6 +3,9 @@
 #include "Game.h"
 #include "Utils.h"
 #include "Patterns.h"
+#include "fx.h"
+
+const char * Menu::_str_unlock_help = "UNLOCK BY SURVIVING 60:00S IN LEVEL #";
 
 Menu::Menu(Game * game) : _game(game)
 {
@@ -19,22 +22,25 @@ void Menu::init()
     _level = 0;
     _time = 0;
     _angle = Utils::toFix(256/12);
-
+    _scroll = 0;
 }
 
 void Menu::update()
 {
 
     _time ++;
+    _scroll ++;
     if (gb.buttons.pressed(BUTTON_LEFT))
     {
         _level = Utils::smod(_level - 1, Patterns::LEVEL_COUNT);
-        gb.sound.playOK();
+        _scroll = 0;
+        _game->gsfx.play(sfx_ok,2);
     }
     if (gb.buttons.pressed(BUTTON_RIGHT))
     {
         _level = Utils::smod(_level + 1, Patterns::LEVEL_COUNT);
-        gb.sound.playOK();
+        _scroll = 0;
+        _game->gsfx.play(sfx_ok,2);
     }
 
     uint32_t score = _game->getScore(_level);
@@ -44,12 +50,19 @@ void Menu::update()
     {
         if (is_unlocked)
         {
-            _game->startHexagon(_level);    
+            _game->startHexagon(_level);
+            _game->gsfx.play(sfx_ok,2);
         }
         else
         {
-            gb.sound.playCancel();
+            _game->gsfx.play(sfx_err,2);
         }
+    }
+
+    if (gb.buttons.pressed(BUTTON_B))
+    {
+        _game->popState();
+        _game->gsfx.play(sfx_back,2);
     }
 
 
@@ -158,7 +171,7 @@ void Menu::draw()
     }
 
     gb.display.setColor(WHITE);
-    char buf[16];
+    char buf[20];
     if (is_unlocked)
     {
         sprintf(buf, "LEVEL %d", _level+1);    
@@ -172,16 +185,49 @@ void Menu::draw()
     Utils::drawTextCenter(40, 16+1, buf);
 
     // PRESS A TO PLAY
-    gb.display.setColor(BLACK);
 
-    x_offset = 20;
-    y_offset = 64-7;
-    for (int i = 0; i < 7; i++)
+
+    if (is_unlocked)
     {
-        gb.display.drawFastHLine(x_offset-i/2,y_offset+i, (40-(x_offset-i/2)) * 2);
+        gb.display.setColor(BLACK);
+        x_offset = 20;
+        y_offset = 64-7;
+        for (int i = 0; i < 7; i++)
+        {
+            gb.display.drawFastHLine(x_offset-i/2,y_offset+i, (40-(x_offset-i/2)) * 2);
+        }
+        gb.display.setColor(WHITE);
+        Utils::drawTextCenter(40, 64-6, "START:\x15");
     }
-    gb.display.setColor(WHITE);
-    Utils::drawTextCenter(40, 64-6, "START:\x15");
+    else
+    {
+        gb.display.setColor(BLACK);
+        x_offset = 0;
+        y_offset = 64-7;
+        for (int i = 0; i < 7; i++)
+        {
+            gb.display.drawFastHLine(x_offset-i/2,y_offset+i, (40-(x_offset-i/2)) * 2);
+        }
+        gb.display.setColor(WHITE);
+
+        int offset = 0;
+        if (_scroll > 25)
+        {
+            offset = (_scroll - 25) >> 2;
+            offset = min(offset,strlen(_str_unlock_help)-19);
+        }
+        memcpy(buf, &_str_unlock_help[offset], 19);
+        buf[19] = '\0';
+
+        if (offset == strlen(_str_unlock_help)-19 )
+        {
+            buf[18] = '0' + _level-2;
+        }
+        gb.display.setCursorX(1);
+        gb.display.setCursorY(64-6);
+        gb.display.printf(buf);
+    }
+
 
     gb.display.setColor(walls);
     y_offset = 32;

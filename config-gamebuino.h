@@ -2,4 +2,7 @@
 
 // SOUND !!!
 #define SOUND_FREQ 22050
-#define SOUND_CHANNELS 2
+#define SOUND_CHANNELS 3
+
+// TITLESCREEN !
+//#define AUTOSHOW_TITLESCREEN 0

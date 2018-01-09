@@ -2,9 +2,7 @@
 #include "Patterns.h"
 #include "Sound.h"
 #include "Game.h"
-#include "SFXR.h"
-
-SFXR::SFX sfx_death(13);
+#include "fx.h"
 
 Hexagon::Hexagon(Game * game) : _game(game)
 {
@@ -61,6 +59,7 @@ void Hexagon::init(const Hexagon::Level * level)
 
     // Init pattern playing
     initPattern(Patterns::getRandomPattern(*_level));
+    current_pattern_position=_pattern_spacing + 20;
 }
 
 void Hexagon::initPattern(const Hexagon::Pattern * pattern)
@@ -81,8 +80,8 @@ void Hexagon::update()
 
     if (_time % 250 == 0)
     {
-        _wall_speed +=4;
-        _player_speed += 4;
+        _wall_speed += _level->player_speed_incr;
+        _player_speed += _level->player_speed_incr;
     }
 
     switch (_state)
@@ -253,7 +252,7 @@ void Hexagon::updateGameOver()
 
     if (_time_death == 0)
     {
-        sfx_death.play();
+        _game->gsfx.play(sfx_explosion);
         _high_score = _game->getScore(_level->id);
         is_highscore = _score > _high_score;
         if (is_highscore)

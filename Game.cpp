@@ -1,9 +1,8 @@
 #include "Game.h"
 #include "Patterns.h"
-#include "SFXR.h"
 
 
-Game::Game() : _menu(this), hexagon(this)
+Game::Game() : _menu(this), hexagon(this), _title(this)
 {
     // Should init nothing, leave that to Game::init()
 }
@@ -18,8 +17,10 @@ void Game::init()
     // Init all the game value (in order to relaunch the game for example)
     _state_ptr = 0;
     _menu.init();
-    SFXR::init();
-    pushState(State::MENU);
+    _title.init();
+    gb.sound.playOK();
+    gsfx.init();
+    pushState(State::TITLE);
 
     // init save
     for (int i = 0; i < 6; i++)
@@ -33,6 +34,9 @@ void Game::update()
     // Update the game !
     switch (_state_stack[_state_ptr])
     {
+        case State::TITLE:
+            _title.update();
+            break;
         case State::MENU:
             _menu.update();
             break;
@@ -50,6 +54,9 @@ void Game::draw()
     // Draw the game!
     switch (_state_stack[_state_ptr])
     {
+        case State::TITLE:
+            _title.draw();
+            break;
         case State::MENU:
             _menu.draw();
             break;
@@ -77,4 +84,10 @@ void Game::startHexagon(uint8_t level_id)
 {
     hexagon.init(Patterns::levels[level_id]);
     pushState(State::HEXAGON);
+}
+
+void Game::startMenu()
+{
+    _menu.init();
+    pushState(State::MENU);
 }

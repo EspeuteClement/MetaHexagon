@@ -6,6 +6,7 @@ class Game;
 class Menu
 {
 public:
+    static const char * _str_unlock_help;
     Menu(Game * game);
     ~Menu();
 
@@ -19,4 +20,6 @@ private:
     uint32_t _time;
     bool _unlocked[6];
     uint32_t _high_scores[6];
-    };
+
+    uint32_t _scroll; // scroll the unlock text
+};

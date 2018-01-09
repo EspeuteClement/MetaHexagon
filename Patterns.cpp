@@ -92,8 +92,7 @@ const Hexagon::Pattern Patterns::patterns[] =
                 {4  ,60,5},
                 {5  ,60,5},
                 {0  ,60,5},
-                {1  ,60,5},
-                {2  ,60,5},
+                 {2  ,60,5},
                 {1  ,90,5},
                 {2  ,90,5},
                 {3  ,90,5},
@@ -137,11 +136,30 @@ const Hexagon::Pattern Patterns::patterns[] =
         }
     };
 
+int16_t angleSpeedCallbackLevel1(int16_t current_speed, uint32_t time)
+{
+    if (time == 0)
+    {
+        return Utils::toFix(1);
+    }
+    if (time % 127 == 0)
+    {
+        current_speed = -(current_speed * 5) / 4;
+        if (abs(current_speed) >= Utils::toFix(2))   // Cap the max speed
+        {
+            current_speed = Utils::sign(current_speed) * Utils::toFix(2);
+        }
+    }
+    return current_speed;
+}
+
 const Hexagon::Level Patterns::level_1 =
     {
         0,
-        Utils::toFix(8),
-        Utils::toFix(1),
+        Utils::toFix(6),
+        2,
+        Utils::toFix(1)/2 + 8,
+        1,
         {
             &patterns[0],
             &patterns[1],
@@ -149,19 +167,23 @@ const Hexagon::Level Patterns::level_1 =
             &patterns[3],
         },
         4,
-        &Patterns::colorCallback_test
+        &Patterns::colorCallback_test,
+        &angleSpeedCallbackLevel1
     };
 
 const Hexagon::Level Patterns::level_2 =
 {
     1,
     Utils::toFix(10),
+    4,
     Utils::toFix(1) + 16,
+    4,
     {
         &patterns[0],
     },
     1,
-    &Patterns::colorCallback_black
+    &Patterns::colorCallback_black,
+    &angleSpeedCallbackLevel1
 };
 
 extern const Hexagon::Level * Patterns::levels[] = 
@@ -184,13 +206,13 @@ void Patterns::colorCallback_test(Color & bg1, Color & bg2, Color & walls, uint3
     }*/
 
     /*walls = gb.createColor(44,232,245);*/
-    Utils::vec3 color = Utils::hsl2rgb({time, 127, 100});
+    Utils::vec3 color = Utils::hsl2rgb({(Utils::cos(time)>>4)+ (1 <<4), 127, 100});
     bg1 = gb.createColor(color.r, color.g, color.b);
     
-    color = Utils::hsl2rgb({time, 160, 127});
+    color = Utils::hsl2rgb({(Utils::cos(time)>>4)+ (1 <<4), 160, 127});
     bg2 = gb.createColor(color.r, color.g, color.b);
     
-    color = Utils::hsl2rgb({time, 200, 200});
+    color = Utils::hsl2rgb({(Utils::cos(time)>>4)+ (1 <<4), 170, 200});
     walls = gb.createColor(color.r, color.g, color.b);
 }
 
@@ -222,18 +244,18 @@ void Patterns::colorCallback_black(Color & bg1, Color & bg2, Color & walls, uint
 {
     if ((time/25) % 2)
     {
-        Utils::vec3 color = Utils::hsl2rgb({time<<2, 50, 10});
+        Utils::vec3 color = Utils::hsl2rgb({time<<2, 50, 20});
         bg1 = gb.createColor(color.r, color.g, color.b);
         
-        color = Utils::hsl2rgb({time<<2, 50, 50});
+        color = Utils::hsl2rgb({time<<2, 50, 40});
         bg2 = gb.createColor(color.r, color.g, color.b);
     }
     else
     {
-        Utils::vec3 color = Utils::hsl2rgb({time<<2, 50, 50});
+        Utils::vec3 color = Utils::hsl2rgb({time<<2, 50, 25});
         bg1 = gb.createColor(color.r, color.g, color.b);
         
-        color = Utils::hsl2rgb({time<<2, 50, 10});
+        color = Utils::hsl2rgb({time<<2, 50, 35});
         bg2 = gb.createColor(color.r, color.g, color.b);
     }
     

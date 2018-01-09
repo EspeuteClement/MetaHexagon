@@ -2,6 +2,9 @@
 - Main menu
     +  ~~Press A to start~~
     +  ~~Best score~~
+    +  Intro screen
+        * by Valden
+        * original by @TerryCavanagh
 - Music
     + Music Level 1
     + Music Level 2
@@ -10,12 +13,12 @@
 - SFX
     + SFX Library
     + SFX for the game
-        * Die
+        * ~~Die~~
         * Start
         * Level select
         * Cancel
-- High score saving
+- ~~High score saving~~
 - Levels
-    + Names
+    + ~~Names~~
     + Patterns
     + Settings

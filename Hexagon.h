@@ -45,10 +45,13 @@ public:
     {
         const uint8_t id;
         const int16_t player_speed;
+        const int16_t player_speed_incr;
         const int16_t wall_speed;
+        const int16_t wall_speed_incr;
         const Pattern * patterns[MAX_PATTERN_PER_LEVEL];
         const uint8_t nb_patterns;
         void (*colorCallback)(Color & bg1, Color & bg2, Color & walls, uint32_t time);
+        int16_t (*angleSpeedCallback)(int16_t current_speed,uint32_t time);
     };
 
     Hexagon(Game * game);
