@@ -17,15 +17,16 @@ const Hexagon::Pattern Patterns::patterns[] =
         {   // 3, then 3, then 3 again  
             9,
             {
-                {1  ,20,5},
-                {3  ,20,5},
-                {5  ,20,5},
-                {0  ,35,5},
-                {2  ,35,5},
-                {4  ,35,5},
-                {1  ,50,5},
-                {3  ,50,5},
-                {5  ,50,5},
+                #define S 20 // spacing between walls
+                {1  ,10,5},
+                {3  ,10,5},
+                {5  ,10,5},
+                {0  ,10+S,5},
+                {2  ,10+S,5},
+                {4  ,10+S,5},
+                {1  ,10+2*S,5},
+                {3  ,10+2*S,5},
+                {5  ,10+2*S,5},
             }
         },
         {   // 2 big walls, zig zag for the others
@@ -163,9 +164,9 @@ const Hexagon::Level Patterns::level_1 =
     {
         0,
         Utils::toFix(6),
-        2,
+        8,
         Utils::toFix(1)/2 + 8,
-        1,
+        5,
         {
             &patterns[0],
             &patterns[1],

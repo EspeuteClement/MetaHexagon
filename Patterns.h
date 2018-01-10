@@ -4,7 +4,7 @@
 
 #pragma once
 
-#define __PATTERN_OVERRIDE__ 0
+#define __PATTERN_OVERRIDE__ 1
 namespace Patterns
 {
 

@@ -80,7 +80,7 @@ void Hexagon::update()
 
     if (_time % 250 == 0)
     {
-        _wall_speed += _level->player_speed_incr;
+        _wall_speed += _level->wall_speed_incr;
         _player_speed += _level->player_speed_incr;
     }
 
