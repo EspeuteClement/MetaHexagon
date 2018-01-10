@@ -15,7 +15,7 @@ public:
     static const uint8_t MAX_WALLS = 32;
     static const uint8_t PLAYER_OFFSET = 3;
     static const uint8_t MAX_WALL_PER_PATTERN = 32;
-    static const uint16_t WALL_SPAWN_OFFSET = 70; // At which distance a wall spawns
+    static const uint16_t WALL_SPAWN_OFFSET = 55; // At which distance a wall spawns
     static const uint8_t MAX_PATTERN_PER_LEVEL = 32;
     static const int32_t FPP = 5; // Fixed point arithmetic precision in bits
     

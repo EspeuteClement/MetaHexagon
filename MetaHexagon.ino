@@ -18,7 +18,6 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
     if (gb.update())
     {
         game.update();

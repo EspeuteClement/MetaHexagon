@@ -173,7 +173,8 @@ void GSFX::Sound_Handler_GSFX::generateNoise()
             bool bit = (lfsr ^ (lfsr >> 1)) & 1;
             lfsr = (lfsr >> 1) ^ (bit << 14);
         }
-        uint32_t sample = (lfsr & 1) ? 0x80808080 : (volume << 24) | (volume << 16) | (volume << 8) | volume;
+        volume = (lfsr & 1) ?  0x80 + getVolume() : 0x80 - getVolume();
+        uint32_t sample = (volume << 24) | (volume << 16) | (volume << 8) | volume;
 
         _head_index = (_head_index+1)%(NUM_SAMPLES>>2);
         _current_fx_time +=4*SR_DIVIDER;

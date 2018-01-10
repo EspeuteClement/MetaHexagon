@@ -59,7 +59,7 @@ void Hexagon::init(const Hexagon::Level * level)
 
     // Init pattern playing
     initPattern(Patterns::getRandomPattern(*_level));
-    current_pattern_position=_pattern_spacing + 20;
+    current_pattern_position=Utils::toFix(_pattern_spacing);
 }
 
 void Hexagon::initPattern(const Hexagon::Pattern * pattern)
