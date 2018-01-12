@@ -5,7 +5,14 @@
 #include "Patterns.h"
 #include "fx.h"
 
+
+#define ALPHA
+
+#ifdef ALPHA
+const char * Menu::_str_unlock_help = "ALPHA VERSION ONLY ONE LEVEL AVAILABLE SORRY";
+#else
 const char * Menu::_str_unlock_help = "UNLOCK BY SURVIVING 60:00S IN LEVEL #";
+#endif
 
 Menu::Menu(Game * game) : _game(game)
 {
@@ -45,6 +52,9 @@ void Menu::update()
 
     uint32_t score = _game->getScore(_level);
     bool is_unlocked = _level < 3 || _game->getScore(_level-3) >= 25*60;
+    #ifdef ALPHA
+        is_unlocked = _level == 0;
+    #endif
 
     if (gb.buttons.pressed(BUTTON_A))
     {
@@ -90,6 +100,9 @@ void Menu::draw()
 {
     uint32_t score = _game->getScore(_level);
     bool is_unlocked = _level < 3 || _game->getScore(_level-3) >= 25*60;
+    #ifdef ALPHA
+        is_unlocked = _level == 0;
+    #endif
 
     Utils::computeLaneTrig(_angle, 6);
     Color bg1, bg2, walls;
@@ -221,7 +234,9 @@ void Menu::draw()
 
         if (offset == strlen(_str_unlock_help)-19 )
         {
+            #ifndef ALPHA
             buf[18] = '0' + _level-2;
+            #endif
         }
         gb.display.setCursorX(1);
         gb.display.setCursorY(64-6);

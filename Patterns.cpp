@@ -5,7 +5,7 @@
 const Hexagon::Pattern Patterns::patterns[] =
     {
         {   
-            5, // All but one wall
+            5, // 0 All but one wall
             {
                 {1  ,10,5},
                 {2  ,10,5},
@@ -29,7 +29,7 @@ const Hexagon::Pattern Patterns::patterns[] =
                 {5  ,10+2*S,5},
             }
         },
-        {   // 2 big walls, zig zag for the others
+        {   // 1 : 2 big walls, zig zag for the others
             
             8,
             {
@@ -45,7 +45,7 @@ const Hexagon::Pattern Patterns::patterns[] =
                 #undef O
             }
         },
-        {   // Spiral
+        {   // 2 : Spiral
             12,
             {
                 {0,10, 10},
@@ -86,44 +86,44 @@ const Hexagon::Pattern Patterns::patterns[] =
             }
         },
         {   
-            15, // All but one wall * 3
+            15, // 3 : All but one wall * 3
             {
-                {1  ,30,5},
-                {2  ,30,5},
-                {3  ,30,5},
-                {4  ,30,5},
-                {5  ,30,5},
-                {4  ,60,5},
-                {5  ,60,5},
-                {0  ,60,5},
-                {1  ,60,5},
-                {2  ,60,5},
-                {1  ,90,5},
-                {2  ,90,5},
-                {3  ,90,5},
-                {4  ,90,5},
-                {5  ,90,5},
+                {1  ,10,5},
+                {2  ,10,5},
+                {3  ,10,5},
+                {4  ,10,5},
+                {5  ,10,5},
+                {4  ,40,5},
+                {5  ,40,5},
+                {0  ,40,5},
+                {1  ,40,5},
+                {2  ,40,5},
+                {1  ,70,5},
+                {2  ,70,5},
+                {3  ,70,5},
+                {4  ,70,5},
+                {5  ,70,5},
             }
         },
-        {   // 3 in quick succesion
+        {   // 4 : 3 in quick succesion
             9,
             {
-                {1  ,20,5},
-                {3  ,20,5},
-                {5  ,20,5},
-                {1  ,32,5},
-                {3  ,32,5},
-                {5  ,32,5},
-                {1  ,44,5},
-                {3  ,44,5},
-                {5  ,44,5}
+                {1  ,10,5},
+                {3  ,10,5},
+                {5  ,10,5},
+                {1  ,22,5},
+                {3  ,22,5},
+                {5  ,22,5},
+                {1  ,34,5},
+                {3  ,34,5},
+                {5  ,34,5}
             }
         },
-        #define WO 6
-        #define S 0
-        {   // Whirlpool
+        {   // 5 :  Whirlpool
             15,
             {
+                #define WO 6
+                #define S 0
                 {1, S + WO, WO*6},
                 {3, S + WO, WO},
                 {4, S + WO, WO*2},
@@ -139,6 +139,52 @@ const Hexagon::Pattern Patterns::patterns[] =
                 {3, S + 13*WO, WO},
                 {4, S + 14 * WO, WO},
                 {5, S + 15*WO, WO}
+                #undef WO
+                #undef S
+            }
+        }, 
+        { // 7: , then 2 to avoid
+            8,
+            {
+                #define O 10
+                #define S 20
+                {1, O, 5},
+                {2, O, 5},
+                {4, O, 5},
+                {5, O, 5},
+                {0, O+S,5},
+                {1, O+S,5},
+                {3,O+S,5},
+                {4,O+S,5}
+                #undef O
+            }
+        },
+        { // 8: , then C with holes
+            4,
+            {
+                #define O 10
+                {1, O, 5},
+                {2, O, 5},
+                {3, O, 5},
+                {5, O, 5},
+                #undef O
+            }
+        },
+        { // 8: , then C with holes
+            8,
+            {
+                #define O 10
+                #define S 25
+                {1, O, 5},
+                {2, O, 5},
+                {3, O, 5},
+                {5, O, S+5},
+                {3, O+S, 5},
+                {4, O+S, 5},
+                {0, O+S, 5},
+                {1, O+S, 5},
+                #undef O
+                #undef S
             }
         }
     };
@@ -151,7 +197,7 @@ int16_t angleSpeedCallbackLevel1(int16_t current_speed, uint32_t time)
     }
     if (time % 127 == 0)
     {
-        current_speed = -(current_speed * 5) / 4;
+        current_speed = -(current_speed * 6) / 5;
         if (abs(current_speed) >= Utils::toFix(2))   // Cap the max speed
         {
             current_speed = Utils::sign(current_speed) * Utils::toFix(2);
@@ -164,15 +210,16 @@ const Hexagon::Level Patterns::level_1 =
     {
         0,
         Utils::toFix(6),
-        8,
+        6,
         Utils::toFix(1)/2 + 8,
-        5,
+        2,
         {
             &patterns[0],
             &patterns[1],
             &patterns[2],
             &patterns[4],
             &patterns[5],
+            &patterns[7],
         },
         4,
         &Patterns::colorCallback_test,

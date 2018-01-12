@@ -54,7 +54,7 @@ void Hexagon::init(const Hexagon::Level * level)
 
     colorCallback = level->colorCallback;
 
-    _pattern_spacing = 30;
+    _pattern_spacing = 20;
 
 
     // Init pattern playing
@@ -102,14 +102,7 @@ void Hexagon::updatePlay()
     _score ++;
 
     // Update rotation
-    if (_time % 127 == 0)
-    {
-        _angle_offset_speed = -(_angle_offset_speed * 4) / 3;
-        if (abs(_angle_offset_speed) >= Utils::toFix(5))   // Cap the max speed
-        {
-            _angle_offset_speed = Utils::sign(_angle_offset_speed) * Utils::toFix(5);
-        }
-    }
+    _angle_offset_speed = _level->angleSpeedCallback(_angle_offset_speed, _time);
 
     // Update pattern
     current_pattern_position += _wall_speed;
