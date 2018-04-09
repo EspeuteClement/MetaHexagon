@@ -23,7 +23,7 @@ void Hexagon::init(const Hexagon::Level * level)
 
     _level = level;
 
-    _sound_channel = gb.sound.play("level1.wav", true);
+
 
     _time = 0;
     _score = 0;
@@ -48,7 +48,8 @@ void Hexagon::init(const Hexagon::Level * level)
     _pump_offset = 0;
     _prev_wav_position = 0;
 
-    _beat_sample_count = SOUND_FREQ * 60 / 100; 
+    _sound_channel = gb.sound.play(_level->song_name, true);
+    _beat_sample_count = SOUND_FREQ * 60 / _level->song_bpm; 
 
     _high_score = 0;
 
@@ -78,11 +79,7 @@ void Hexagon::update()
     _time ++;
     computeAngleOffset();
 
-    if (_time % 250 == 0)
-    {
-        _wall_speed += _level->wall_speed_incr;
-        _player_speed += _level->player_speed_incr;
-    }
+
 
     switch (_state)
     {
@@ -103,6 +100,13 @@ void Hexagon::updatePlay()
 
     // Update rotation
     _angle_offset_speed = _level->angleSpeedCallback(_angle_offset_speed, _time);
+
+    // Update wall speed
+    if (_time % 250 == 0)
+    {
+        _wall_speed += _level->wall_speed_incr;
+        _player_speed += _level->player_speed_incr;
+    }
 
     // Update pattern
     current_pattern_position += _wall_speed;
@@ -139,7 +143,7 @@ void Hexagon::updatePlay()
     _center_distance = 6;
 
     // Pump
-    _pump_offset -= PUMP_FALLOFF;
+    _pump_offset -= _level->pump_falloff;
 
     if (_pump_offset < 0)
     {
@@ -148,16 +152,22 @@ void Hexagon::updatePlay()
 
     //Gamebuino_Meta::Sound_Handler_Wav * wav_player = (Gamebuino_Meta::Sound_Handler_Wav *) (*gb.sound.getHandler(_sound_channel));
 
+    uint16_t _wav_position = 0;
     if (_sound_channel != -1 && !gb.sound.isMute())
     {
-        uint16_t _wav_position = gb.sound.getPos(_sound_channel)%_beat_sample_count;
-        if (_wav_position < _prev_wav_position)
-        {
-            _pump_offset = PUMP_SET;
-        }
-        _prev_wav_position = _wav_position;
+        _wav_position = gb.sound.getPos(_sound_channel)%(_beat_sample_count);
     }
-
+    else
+    {
+        // Simulate beat using time
+        _wav_position = (_time * SAMPLES_PER_FRAME)%(_beat_sample_count);    
+    }
+    
+    if (_wav_position < _prev_wav_position)
+    {
+        _pump_offset = _level->pump_set;
+    }
+    _prev_wav_position = _wav_position;
 
 
 

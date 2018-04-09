@@ -17,7 +17,7 @@ const Hexagon::Pattern Patterns::patterns[] =
         {   // 3, then 3, then 3 again  
             9,
             {
-                #define S 20 // spacing between walls
+                #define S 25 // spacing between walls
                 {1  ,10,5},
                 {3  ,10,5},
                 {5  ,10,5},
@@ -33,7 +33,7 @@ const Hexagon::Pattern Patterns::patterns[] =
             
             8,
             {
-                #define O 20
+                #define O 25
                 {0, 10,O*2 + 5},
                 {3, 10,O*2 + 5},
                 {2, 10, 5},
@@ -143,11 +143,11 @@ const Hexagon::Pattern Patterns::patterns[] =
                 #undef S
             }
         }, 
-        { // 7: , then 2 to avoid
+        { // 7: , 2,  then 2 to avoid
             8,
             {
                 #define O 10
-                #define S 20
+                #define S 30
                 {1, O, 5},
                 {2, O, 5},
                 {4, O, 5},
@@ -170,11 +170,11 @@ const Hexagon::Pattern Patterns::patterns[] =
                 #undef O
             }
         },
-        { // 8: , then C with holes
+        { // 9: , uturn
             8,
             {
                 #define O 10
-                #define S 25
+                #define S 30
                 {1, O, 5},
                 {2, O, 5},
                 {3, O, 5},
@@ -209,10 +209,8 @@ int16_t angleSpeedCallbackLevel1(int16_t current_speed, uint32_t time)
 const Hexagon::Level Patterns::level_1 =
     {
         0,
-        Utils::toFix(6),
-        6,
-        Utils::toFix(1)/2 + 8,
-        2,
+        Utils::toFix(6),8,
+        Utils::toFix(1)/2+2,2,
         {
             &patterns[0],
             &patterns[1],
@@ -221,7 +219,9 @@ const Hexagon::Level Patterns::level_1 =
             &patterns[5],
             &patterns[7],
         },
-        4,
+        6,
+        "level1.wav",100,
+        Utils::toFix(1)+(Utils::toFix(1)>>1),16,
         &Patterns::colorCallback_test,
         &angleSpeedCallbackLevel1
     };
@@ -229,14 +229,14 @@ const Hexagon::Level Patterns::level_1 =
 const Hexagon::Level Patterns::level_2 =
 {
     1,
-    Utils::toFix(10),
-    4,
-    Utils::toFix(1) + 16,
-    4,
+    Utils::toFix(10),4,
+    Utils::toFix(1) + 16,4,
     {
         &patterns[0],
     },
     1,
+    "level1.wav",100,
+    Utils::toFix(1)+(Utils::toFix(1)>>1),16,
     &Patterns::colorCallback_black,
     &angleSpeedCallbackLevel1
 };

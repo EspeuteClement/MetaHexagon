@@ -19,9 +19,7 @@ public:
     static const uint8_t MAX_PATTERN_PER_LEVEL = 32;
     static const int32_t FPP = 5; // Fixed point arithmetic precision in bits
     
-    static const uint16_t PUMP_SET = Utils::toFix(3); // How much the pump is at max level
-    static const uint16_t PUMP_FREQ = 20; // How much frames we wait before we pump
-    static const uint16_t PUMP_FALLOFF = 16; // divide by 256 
+    static const uint16_t SAMPLES_PER_FRAME = (SOUND_FREQ)/25; 
     
     static const uint32_t PUMP_DEATH_ZOOM = 32;
     static const uint32_t PUMP_DEATH_MAX = 20 << FPP;
@@ -50,6 +48,10 @@ public:
         const int16_t wall_speed_incr;
         const Pattern * patterns[MAX_PATTERN_PER_LEVEL];
         const uint8_t nb_patterns;
+        const char * song_name;
+        const uint8_t song_bpm;
+        const uint16_t pump_set;
+        const uint16_t pump_falloff;
         void (*colorCallback)(Color & bg1, Color & bg2, Color & walls, uint32_t time);
         int16_t (*angleSpeedCallback)(int16_t current_speed,uint32_t time);
     };

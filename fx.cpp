@@ -2,7 +2,7 @@
 
 GSFX::FX sfx_ok[] =
 {
-    {GSFX::WaveType::SQUARE, 19968,0,8192,0,1000},
+    //{GSFX::WaveType::SQUARE, 19968,0,8192,0,1000},
     {GSFX::WaveType::SQUARE, 19968,-21,4096,0,3000}
 };
 
